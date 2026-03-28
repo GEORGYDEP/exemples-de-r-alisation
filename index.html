@@ -782,5 +782,30 @@
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 
+<script>
+// ═══════════════ SUIVI DES VISITEURS ═══════════════
+var TRACKER_URL = 'https://script.google.com/macros/s/AKfycbwHzA6aRUtdTkPycAFznto-mbsnN1ZxzjoN48Ep4n4OEc0tKTwgF0iV--pY6az4PJqv/exec';
+(function() {
+  if (!sessionStorage.getItem('visitorSessionId')) {
+    sessionStorage.setItem('visitorSessionId', 'V-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 7));
+  }
+  var sessionId = sessionStorage.getItem('visitorSessionId');
+  try {
+    fetch(TRACKER_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        a: sessionId,
+        b: 'ComptaLab - Applications Éducatives',
+        c: window.location.href,
+        d: document.referrer || 'direct',
+        e: navigator.userAgent.substring(0, 150),
+        f: screen.width + 'x' + screen.height
+      })
+    });
+  } catch(err) {}
+})();
+</script>
+
 </body>
 </html>
