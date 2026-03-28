@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ComptaLab — Applications Éducatives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  :root {
+    --bg-deep: #0a0a0f;
+    --bg-card: #12121a;
+    --bg-card-hover: #1a1a28;
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-glow: rgba(200,170,110,0.25);
+    --text-primary: #f0ece4;
+    --text-secondary: #8a8697;
+    --text-muted: #5a5768;
+    --accent-gold: #c8aa6e;
+    --accent-gold-bright: #e4c87a;
+    --accent-warm: #d4956a;
+    --accent-blue: #6a8fd4;
+    --accent-emerald: #6ad4a0;
+    --accent-rose: #d46a8f;
+    --accent-violet: #9a6ad4;
+    --accent-cyan: #6ac8d4;
+    --radius: 16px;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── GRAIN OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(200,170,110,0.08) 0%, transparent 70%);
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    animation: pulse-glow 8s ease-in-out infinite;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 200px;
+    background: linear-gradient(to top, var(--bg-deep), transparent);
+  }
+
+  @keyframes pulse-glow {
+    0%,100% { opacity: 0.6; transform: translateX(-50%) scale(1) }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.1) }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    border: 1px solid var(--border-glow);
+    padding: 8px 20px;
+    border-radius: 100px;
+    margin-bottom: 2.5rem;
+    animation: fade-in-up 1s ease both;
+    backdrop-filter: blur(10px);
+    background: rgba(200,170,110,0.04);
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent-gold);
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity: 1 }
+    50% { opacity: 0.3 }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5em;
+    animation: fade-in-up 1s 0.15s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero h1 .line-accent {
+    display: block;
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-warm));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: var(--text-secondary);
+    max-width: 600px;
+    line-height: 1.7;
+    font-weight: 300;
+    animation: fade-in-up 1s 0.3s ease both;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 5rem;
+  }
+
+  .hero-sub strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 3rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    animation: fade-in-up 1s 0.6s ease both;
+  }
+
+  .scroll-hint span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--accent-gold), transparent);
+    animation: scroll-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scroll-pulse {
+    0%,100% { transform: scaleY(1); opacity: 1 }
+    50% { transform: scaleY(0.5); opacity: 0.4 }
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(30px) }
+    to { opacity: 1; transform: translateY(0) }
+  }
+
+  /* ─── FEATURES BAR ─── */
+  .features-bar {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 3rem 2rem;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .features-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-subtle), transparent);
+  }
+
+  .feature-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .feature-pill .icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.15;
+  }
+
+  .section-desc {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 3.5rem;
+    font-weight: 300;
+  }
+
+  /* ─── APP GRID ─── */
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* ─── APP CARD ─── */
+  .app-card {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    overflow: hidden;
+    cursor: default;
+  }
+
+  .app-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--card-accent) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .app-card:hover {
+    border-color: var(--card-accent);
+    background: var(--bg-card-hover);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px -15px rgba(0,0,0,0.5), 0 0 40px -10px var(--card-accent);
+  }
+
+  .app-card:hover::before { opacity: 0.06 }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .card-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.4s ease;
+  }
+
+  .app-card:hover .card-icon {
+    background: var(--card-accent);
+    border-color: var(--card-accent);
+    box-shadow: 0 4px 20px -4px var(--card-accent);
+  }
+
+  .card-category {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .card-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    font-weight: 300;
+    flex-grow: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--card-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    border-radius: 12px;
+  }
+
+  .card-cta:hover {
+    border-color: var(--card-accent);
+    color: #fff;
+    box-shadow: 0 4px 25px -5px var(--card-accent);
+  }
+
+  .card-cta:hover::before {
+    transform: scaleX(1);
+  }
+
+  .card-cta span,
+  .card-cta .arrow {
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-cta .arrow {
+    transition: transform 0.3s ease;
+    font-size: 1.1rem;
+  }
+
+  .card-cta:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  /* Card accent colors */
+  .app-card[data-accent="gold"]    { --card-accent: var(--accent-gold) }
+  .app-card[data-accent="warm"]    { --card-accent: var(--accent-warm) }
+  .app-card[data-accent="blue"]    { --card-accent: var(--accent-blue) }
+  .app-card[data-accent="emerald"] { --card-accent: var(--accent-emerald) }
+  .app-card[data-accent="rose"]    { --card-accent: var(--accent-rose) }
+  .app-card[data-accent="violet"]  { --card-accent: var(--accent-violet) }
+  .app-card[data-accent="cyan"]    { --card-accent: var(--accent-cyan) }
+
+  /* ─── BOTTOM CTA ─── */
+  .bottom-cta {
+    text-align: center;
+    padding: 5rem 2rem 6rem;
+    position: relative;
+  }
+
+  .bottom-cta::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,170,110,0.06) 0%, transparent 70%);
+    bottom: -200px; left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .bottom-cta p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto 1rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .bottom-cta .credit {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-top: 2rem;
+  }
+
+  .bottom-cta .credit a {
+    color: var(--accent-gold);
+    text-decoration: none;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2.5rem;
+    padding: 16px 32px;
+    border-radius: 100px;
+    border: 1px solid var(--border-glow);
+    color: var(--accent-gold);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    background: rgba(200,170,110,0.04);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .back-link:hover {
+    background: rgba(200,170,110,0.12);
+    border-color: var(--accent-gold);
+    box-shadow: 0 4px 30px -5px rgba(200,170,110,0.25);
+    transform: translateY(-2px);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .app-grid {
+      grid-template-columns: 1fr;
+    }
+    .features-bar {
+      gap: 1.5rem;
+    }
+    .hero { min-height: 90vh; padding: 2rem 1.5rem }
+    .section { padding: 3rem 1.5rem 4rem }
+    .app-card { padding: 1.5rem }
+  }
+</style>
+</head>
+<body>
+
+<!-- ━━━ HERO ━━━ -->
+<section class="hero">
+  <div class="hero-badge">
+    <span>Institut Saint-Luc Frameries</span>
+  </div>
+  <h1>
+    Apprendre la<br>
+    <span class="line-accent">comptabilité</span><br>
+    autrement.
+  </h1>
+  <p class="hero-sub">
+    Découvrez quelques exemples d'applications pédagogiques que nous construisons <strong>spécifiquement pour les besoins de l'élève</strong> et en fonction du programme d'étude. Apprenez à votre rythme, recommencez autant de fois que nécessaire, traduisez instantanément si besoin.
+  </p>
+  <div class="scroll-hint">
+    <span>Découvrir</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ━━━ FEATURES BAR ━━━ -->
+<div class="features-bar">
+  <div class="feature-pill">
+    <div class="icon">🔄</div>
+    <span>Exercices illimités</span>
+  </div>
+  <div class="feature-pill">
+    <div class="icon">🌍</div>
+    <span>Traduction instantanée</span>
+  </div>
+  <div class="feature-pill">
+    <div class="icon">📊</div>
+    <span>Correction en temps réel</span>
+  </div>
+  <div class="feature-pill">
+    <div class="icon">📱</div>
+    <span>Compatible mobile</span>
+  </div>
+</div>
+
+<!-- ━━━ APPS SECTION ━━━ -->
+<section class="section">
+  <div class="section-label reveal">// applications</div>
+  <h2 class="section-title reveal">Quelques exemples de nos applications.</h2>
+  <p class="section-desc reveal">
+    Sept modules sur mesure, construits selon le programme FESeC. Chacun cible un chapitre essentiel — pas de blabla, que de la pratique guidée.
+  </p>
+
+  <div class="app-grid">
+
+    <!-- CARD 1 — Amortissements linéaires -->
+    <div class="app-card reveal" data-accent="gold">
+      <div class="card-header">
+        <div class="card-icon">📉</div>
+        <div>
+          <div class="card-category">Immobilisations</div>
+          <div class="card-title">Amortissements linéaires</div>
+        </div>
+      </div>
+      <p class="card-desc">
+        Construisez un tableau d'amortissement de A à Z et passez les écritures comptables. Le réflexe qui transforme un achat en charges réparties.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Tableau d'amort.</span>
+        <span class="tag">Écritures</span>
+        <span class="tag">PCMN</span>
+      </div>
+      <a href="https://georgydep.github.io/amortissements-et-comptabilisation-1/" target="_blank" class="card-cta">
+        <span>Lancer l'application</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <!-- CARD 2 — Prorata temporis -->
+    <div class="app-card reveal" data-accent="warm">
+      <div class="card-header">
+        <div class="card-icon">📅</div>
+        <div>
+          <div class="card-category">Immobilisations</div>
+          <div class="card-title">Amortissements & Prorata Temporis</div>
+        </div>
+      </div>
+      <p class="card-desc">
+        L'actif n'a pas été acquis le 1er janvier ? Calculez la première annuité au prorata et gérez l'annuité complémentaire. Le piège classique, enfin maîtrisé.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Prorata</span>
+        <span class="tag">Annuité partielle</span>
+        <span class="tag">Calcul jours</span>
+      </div>
+      <a href="https://georgydep.github.io/amortissement-et-prorata-avec-r-ponses/" target="_blank" class="card-cta">
+        <span>Lancer l'application</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <!-- CARD 3 — Vente d'actif -->
+    <div class="app-card reveal" data-accent="emerald">
+      <div class="card-header">
+        <div class="card-icon">💰</div>
+        <div>
+          <div class="card-category">Immobilisations</div>
+          <div class="card-title">Vente d'un actif non totalement amorti</div>
+        </div>
+      </div>
+      <p class="card-desc">
+        Vendez un bien avant la fin de son amortissement. Plus-value ou moins-value ? Apprenez à solder les comptes et à enregistrer le résultat de cession.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Cession</span>
+        <span class="tag">Plus-value</span>
+        <span class="tag">Solde comptes</span>
+      </div>
+      <a href="https://georgydep.github.io/Vente-d-actif-1-avec-plus-value/" target="_blank" class="card-cta">
+        <span>Lancer l'application</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <!-- CARD 4 — Le crédit -->
+    <div class="app-card reveal" data-accent="blue">
+      <div class="card-header">
+        <div class="card-icon">🏦</div>
+        <div>
+          <div class="card-category">Financement</div>
+          <div class="card-title">Le Crédit Financier</div>
+        </div>
+      </div>
+      <p class="card-desc">
+        Réception des fonds, remboursement de la mensualité, reclassement au 31/12 — les 3 étapes clés d'un emprunt, décortiquées et comptabilisées pas à pas.
+      </p>
+      <div class="card-tags">
+        <span class="tag">3 étapes</span>
+        <span class="tag">Mensualité</span>
+        <span class="tag">Reclassement</span>
+      </div>
+      <a href="https://georgydep.github.io/les-3-tapes-du-cr-dit/" target="_blank" class="card-cta">
+        <span>Lancer l'application</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <!-- CARD 5 — Leasing -->
+    <div class="app-card reveal" data-accent="violet">
+      <div class="card-header">
+        <div class="card-icon">🔑</div>
+        <div>
+          <div class="card-category">Financement</div>
+          <div class="card-title">Le Leasing Financier</div>
+        </div>
+      </div>
+      <p class="card-desc">
+        Location-financement : signature, redevance trimestrielle, levée d'option. Maîtrisez le contrat de leasing et ses écritures spécifiques à chaque étape.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Location-fin.</span>
+        <span class="tag">Redevance</span>
+        <span class="tag">Option d'achat</span>
+      </div>
+      <a href="https://georgydep.github.io/Le-leasing/" target="_blank" class="card-cta">
+        <span>Lancer l'application</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <!-- CARD 6 — Affectation de résultat -->
+    <div class="app-card reveal" data-accent="rose">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div>
+          <div class="card-category">Droit des sociétés</div>
+          <div class="card-title">L'Affectation de Résultat</div>
+        </div>
+      </div>
+      <p class="card-desc">
+        Bénéfice d'une SA : réserve légale, dividendes, report — comment répartir le résultat selon les règles du Code des Sociétés. Le passage obligé de la clôture.
+      </p>
+      <div class="card-tags">
+        <span class="tag">SA</span>
+        <span class="tag">Dividendes</span>
+        <span class="tag">Réserve légale</span>
+      </div>
+      <a href="https://georgydep.github.io/l-affectation-de-r-sultat/" target="_blank" class="card-cta">
+        <span>Lancer l'application</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <!-- CARD 7 — Provisions -->
+    <div class="app-card reveal" data-accent="cyan">
+      <div class="card-header">
+        <div class="card-icon">🛡️</div>
+        <div>
+          <div class="card-category">Charges & Risques</div>
+          <div class="card-title">Les Provisions</div>
+        </div>
+      </div>
+      <p class="card-desc">
+        Un risque probable, un montant estimable : constituez, utilisez et reprenez une provision. L'art de la prudence comptable en écritures concrètes.
+      </p>
+      <div class="card-tags">
+        <span class="tag">Provision</span>
+        <span class="tag">Principe prudence</span>
+        <span class="tag">Dotation/Reprise</span>
+      </div>
+      <a href="https://georgydep.github.io/les-provisions/" target="_blank" class="card-cta">
+        <span>Lancer l'application</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ━━━ BOTTOM CTA ━━━ -->
+<div class="bottom-cta">
+  <div class="section-label reveal">// pédagogie</div>
+  <h2 class="section-title reveal" style="max-width:600px;margin:0 auto 1rem;">
+    La théorie s'oublie.<br>La pratique <em style="color:var(--accent-gold);font-style:italic;">reste</em>.
+  </h2>
+  <p class="reveal">
+    Chaque application plonge l'élève dans un cas concret — documents réels, montants crédibles, validation immédiate. Pas de note, juste de la progression.
+  </p>
+  <div class="credit reveal">
+    Créé par Mr Depret — Professeur en comptabilité
+  </div>
+  <a href="https://georgydep.github.io/Pr-sentation-technicien-en-comptabilit-/" class="back-link reveal" target="_blank">
+    ← Retour au site de présentation de la section Comptabilité
+  </a>
+</div>
+
+<!-- ━━━ FOOTER ━━━ -->
+<footer>
+  Institut Saint-Luc Frameries &middot; Section Technicien·ne en Comptabilité &middot; 2026
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
