@@ -786,16 +786,21 @@
 // ═══════════════ SUIVI DES VISITEURS ═══════════════
 var TRACKER_URL = 'https://script.google.com/macros/s/AKfycbwHzA6aRUtdTkPycAFznto-mbsnN1ZxzjoN48Ep4n4OEc0tKTwgF0iV--pY6az4PJqv/exec';
 (function() {
-  if (!sessionStorage.getItem('visitorSessionId')) {
-    sessionStorage.setItem('visitorSessionId', 'V-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 7));
+  var SESSION_DURATION = 30 * 60 * 1000;
+  var now = Date.now();
+  var stored = localStorage.getItem('visitorSession');
+  var session = stored ? JSON.parse(stored) : null;
+  if (!session || (now - session.ts) > SESSION_DURATION) {
+    session = { id: 'V-' + now.toString(36) + '-' + Math.random().toString(36).substring(2,7), ts: now };
   }
-  var sessionId = sessionStorage.getItem('visitorSessionId');
+  session.ts = now;
+  localStorage.setItem('visitorSession', JSON.stringify(session));
   try {
     fetch(TRACKER_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
-        a: sessionId,
+        a: session.id,
         b: 'ComptaLab - Applications Éducatives',
         c: window.location.href,
         d: document.referrer || 'direct',
@@ -803,6 +808,8 @@ var TRACKER_URL = 'https://script.google.com/macros/s/AKfycbwHzA6aRUtdTkPycAFznt
         f: screen.width + 'x' + screen.height
       })
     });
+  } catch(err) {}
+})();
   } catch(err) {}
 })();
 </script>
